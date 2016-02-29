@@ -64,13 +64,13 @@ class Follow(db.Model):
 
 
 
-class Comment(UserMixin, db.Model):
-    __tablename__ = 'comments'
+class Answer(UserMixin, db.Model):
+    __tablename__ = 'answers'
     id = db.Column(db.Integer, primary_key=True)
-    comment = db.Column(db.Text())
+    answer = db.Column(db.Text())
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))    
+    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))    
 
 
 class User(UserMixin, db.Model):
@@ -86,9 +86,8 @@ class User(UserMixin, db.Model):
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
-    posts = db.relationship('Post', backref='author', lazy='dynamic')
-    
-    comments = db.relationship('Comment', backref='author', lazy='dynamic')
+    questions = db.relationship('Question', backref='author', lazy='dynamic')
+    answers = db.relationship('Answer', backref='author', lazy='dynamic')
     
     """
     followed = db.relationship('User',
@@ -218,15 +217,15 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-class Post(db.Model):
-    __tablename__ = 'posts'
+class Question(db.Model):
+    __tablename__ = 'questions'
     id = db.Column(db.Integer, primary_key=True)
-# add title of post !    
+# add title of question !    
     title = db.Column(db.String)  
     body = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    comments = db.relationship('Comment', backref='post', lazy='dynamic')
+    answers = db.relationship('Answer', backref='question', lazy='dynamic')
     @staticmethod
     def generate_fake(count=100):
         from random import seed, randint
@@ -236,7 +235,7 @@ class Post(db.Model):
         user_count = User.query.count()
         for i in range(count):
             u = User.query.offset(randint(0, user_count - 1)).first()
-            p = Post(body=forgery_py.lorem_ipsum.sentences(randint(1, 5)),
+            p = Question(body=forgery_py.lorem_ipsum.sentences(randint(1, 5)),
                      timestamp=forgery_py.date.date(True),
                      author=u)
             db.session.add(p)

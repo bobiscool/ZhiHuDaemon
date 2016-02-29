@@ -1,67 +1,149 @@
 {% extends "bootstrap/base.html" %}
 
-{% block title %}Flasky{% endblock %}
+{% block title %}知乎{% endblock %}
 
 {% block head %}
 {{ super() }}
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+<style type="text/css">
+  .navbar-default {
+  background-color: #0663c1;
+  border-color: #065fb6;
+  }
+  .navbar-default .navbar-brand {
+  color: #ecf0f1;
+  }
+  .navbar-default .navbar-brand:hover,
+  .navbar-default .navbar-brand:focus {
+  color: #ffbbbc;
+  }
+  .navbar-default .navbar-text {
+  color: #ecf0f1;
+  }
+  .navbar-default .navbar-nav > li > a {
+  color: #ecf0f1;
+  }
+  .navbar-default .navbar-nav > li > a:hover,
+  .navbar-default .navbar-nav > li > a:focus {
+  color: #ffbbbc;
+  }
+  .navbar-default .navbar-nav > .active > a,
+  .navbar-default .navbar-nav > .active > a:hover,
+  .navbar-default .navbar-nav > .active > a:focus {
+  color: #ffbbbc;
+  background-color: #065fb6;
+  }
+  .navbar-default .navbar-nav > .open > a,
+  .navbar-default .navbar-nav > .open > a:hover,
+  .navbar-default .navbar-nav > .open > a:focus {
+  color: #ffbbbc;
+  background-color: #065fb6;
+  }
+  .navbar-default .navbar-toggle {
+  border-color: #065fb6;
+  }
+  .navbar-default .navbar-toggle:hover,
+  .navbar-default .navbar-toggle:focus {
+  background-color: #065fb6;
+  }
+  .navbar-default .navbar-toggle .icon-bar {
+  background-color: #ecf0f1;
+  }
+  .navbar-default .navbar-collapse,
+  .navbar-default .navbar-form {
+  border-color: #ecf0f1;
+  }
+  .navbar-default .navbar-link {
+  color: #ecf0f1;
+  }
+  .navbar-default .navbar-link:hover {
+  color: #ffbbbc;
+  }
+  .navbar-default .navbar-nav .open .dropdown-menu>li>a,.navbar-default .navbar-nav .open .dropdown-menu {
+  background-color: #0663c1;
+  color:#ffffff;
+    }
+
+</style>
 {% endblock %}
 
 {% block navbar %}
-<div class="navbar navbar-inverse" role="navigation">
-    <div class="container">
+<div class="navbar-default" role="navigation">
+  <div class="container">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
+                <span class="icon-bar"></span> 
             </button>
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">Flasky</a>
+            <a class="navbar-brand" style="font-size:30px" href="{{ url_for('main.index') }}">知乎</a>
         </div>
+
         <div class="navbar-collapse collapse">
+	  <form class="navbar-form navbar-left" role="search">
+	    <div class="form-group">
+	      <input type="text" class="form-control" style="width:280px" placeholder="Search">
+	    </div>
+	<span class="glyphicon glyphicon-search" aria-hidden="true" style="color:white"></span>
+          </form>
             <ul class="nav navbar-nav">
-                <li><a href="{{ url_for('main.index') }}">Home</a></li>
-                {% if current_user.is_authenticated %}
-                <li><a href="{{ url_for('main.user', username=current_user.username) }}">Profile</a></li>
-                {% endif %}
+                <li><a href="{{ url_for('main.index') }}">首页</a></li>
+                <li><a href="{{ url_for('main.test') }}">话题</a></li>
+                <li><a href="{{ url_for('main.test') }}">发现</a></li>
+                <li><a href="{{ url_for('main.test') }}">消息</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
+                <li><a href="{{ url_for('main.index') }}">提问</a></li>
                 {% if current_user.is_authenticated %}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <img src="{{ current_user.gravatar(size=18) }}">
-                        Account <b class="caret"></b>
+                        {{current_user.username}} <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url_for('auth.change_password') }}">Change Password</a></li>
-                        <li><a href="{{ url_for('auth.change_email_request') }}">Change Email</a></li>
-                        <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                        <li><a href="{{ url_for('main.user', username=current_user.username) }}">我的主页</a></li>
+                        <li><a href="{{ url_for('main.test') }}">私信</a></li>		                                           <li><a href="{{ url_for('main.test') }}">设置</a></li>		      		                      <li><a href="{{ url_for('auth.logout') }}">退出</a></li>
                     </ul>
                 </li>
                 {% else %}
-                <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
+
+                <li><a href="{{ url_for('auth.register') }}">
+		    <span class="glyphicon glyphicon-user" aria-hidden="true" style="color:white"> 注册知乎</a></li>		
+                <li><a href="{{ url_for('auth.login') }}"> 登录</a></li>
                 {% endif %}
             </ul>
         </div>
-    </div>
+    </div>	
+    <div class="col-md-1"></div>
+  </div>
 </div>
 {% endblock %}
 
-{% block content %}
 <div class="container">
-    {% for message in get_flashed_messages() %}
-    <div class="alert alert-warning">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        {{ message }}
-    </div>
-    {% endfor %}
 
-    {% block page_content %}{% endblock %}
+    {% block content %}
+	{% for message in get_flashed_messages() %}
+	<div class="alert alert-warning">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          {{ message }}
+	</div>
+	{% endfor %}
+
+	<div class="col-md-2"></div>
+	  
+	<div class="col-md-6">
+	  {% block page_content %}{% endblock %}
+        </div>
+	<div class="col-md-4">
+	  {% block rside_bar   %}  {% endblock %}
+	</div>	  
+    {% endblock %}
 </div>
-{% endblock %}
 
 {% block scripts %}
 {{ super() }}

@@ -1,27 +1,33 @@
 {% extends "base.html" %}
 {% import "_macros.html" as macros %}
 
-{% block title %}Flasky - {{ user.username }}{% endblock %}
+{% block title %}super()y - {{ user.username }}{% endblock %}
 
 {% block page_content %}
 <div class="page-header">
-    <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=256) }}">
     <div class="profile-header">
         <h1>{{ user.username }}</h1>
         {% if user.name or user.location %}
         <p>
             {% if user.name %}{{ user.name }}<br>{% endif %}
-            {% if user.location %}
-                From <a href="http://maps.google.com/?q={{ user.location }}">{{ user.location }}</a><br>
-            {% endif %}
+<!--            <img class="img-rounded profile-thumbnail" src="{{ user.gravatar() }}">
+-->
         </p>
         {% endif %}
-        {% if current_user.is_administrator() %}
-        <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
-        {% endif %}
         {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
-        <p>Member since {{ moment(user.member_since).format('L') }}. Last seen {{ moment(user.last_seen).fromNow() }}.</p>
-        <p>{{ user.posts.count() }} blog posts.</p>
+	<p>  获得&nbsp; &nbsp <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> &nbsp 赞同
+	     &nbsp <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> &nbsp 感谢
+	</p>
+	<nav class="navbar navbar-default style="color:white"">
+	  <ul class="nav navbar-nav">
+	  <li class="navbar-left"><a href="#">提问</a></li>
+	  <li><a href="#">回答</a></li>
+	  <li><a href="#">专栏文章</a></li>
+	  <li><a href="#">收藏</a></li>
+	  <li><a href="#">公共编辑</a></li>
+	  </ul>
+	</nav>
+        <p>{{ user.questions.count() }} blog questions.</p>
         <p>
             {% if user == current_user %}
             <a class="btn btn-default" href="{{ url_for('.edit_profile') }}">Edit Profile</a>

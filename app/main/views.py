@@ -2,39 +2,42 @@ from flask import render_template, redirect, url_for, abort, flash, request,\
     current_app
 from flask.ext.login import login_required, current_user
 from . import main
-from .forms import EditProfileForm, EditProfileAdminForm, PostForm
+from .forms import EditProfileForm, EditProfileAdminForm, QuestionForm
 from .. import db
-from ..models import Permission, Role, User, Post
+from ..models import Permission, Role, User, Question
 from ..decorators import admin_required
 
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
-    form = PostForm()
+    form = QuestionForm()
     if current_user.can(Permission.WRITE_ARTICLES) and \
             form.validate_on_submit():
-        post = Post(body=form.body.data,
+        question = Question(body=form.body.data,
                     author=current_user._get_current_object())
-        db.session.add(post)
+        db.session.add(question)
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
-    pagination = Post.query.order_by(Post.timestamp.desc()).paginate(
-        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+    pagination = Question.query.order_by(Question.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_QUESTIONS_PER_PAGE'],
         error_out=False)
-    posts = pagination.items
-    return render_template('index.html', form=form, posts=posts,
+    questions = pagination.items
+    return render_template('index.html', form=form, questions=questions,
                            pagination=pagination)
 
+@main.route('/test', methods=['GET', 'POST'])
+def test():
+    return render_template("test.html")
 
 @main.route('/user/<username>')
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
-    pagination = user.posts.order_by(Post.timestamp.desc()).paginate(
-        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+    pagination = user.questions.order_by(Question.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_QUESTIONS_PER_PAGE'],
         error_out=False)
-    posts = pagination.items
-    return render_template('user.html', user=user, posts=posts,
+    questions = pagination.items
+    return render_template('user.html', user=user, questions=questions,
                            pagination=pagination)
 
 
