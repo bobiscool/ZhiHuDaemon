@@ -1,0 +1,10 @@
+<ul class="posts">
+    {% for question in questions %}
+    <li class="post">
+            <a href="{{ url_for('.question', id=question.id) }}">
+	       <h4> {{ question.title }} </h4>
+            </a>
+           <div class="post-body">{{ question.body }}</div>
+    </li>
+    {% endfor %}
+</ul>

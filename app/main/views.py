@@ -1,44 +1,101 @@
+# -*- coding: utf-8 -*
 from flask import render_template, redirect, url_for, abort, flash, request,\
     current_app
 from flask.ext.login import login_required, current_user
 from . import main
-from .forms import EditProfileForm, EditProfileAdminForm, QuestionForm
+from .forms import EditProfileForm, EditProfileAdminForm, QuestionForm, AnswerForm, CommentForm
 from .. import db
-from ..models import Permission, Role, User, Question
+from ..models import Permission, Role, User, Question, Answer, Comment
 from ..decorators import admin_required
 
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
-    form = QuestionForm()
-    if current_user.can(Permission.WRITE_ARTICLES) and \
-            form.validate_on_submit():
-        question = Question(body=form.body.data,
-                    author=current_user._get_current_object())
-        db.session.add(question)
-        return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
     pagination = Question.query.order_by(Question.timestamp.desc()).paginate(
-        page, per_page=current_app.config['FLASKY_QUESTIONS_PER_PAGE'],
+        page, per_page=current_app.config['INDEX_QUESTIONS_PER_PAGE'],
         error_out=False)
     questions = pagination.items
-    return render_template('index.html', form=form, questions=questions,
+    return render_template('index.html', questions=questions,
                            pagination=pagination)
 
 @main.route('/test', methods=['GET', 'POST'])
 def test():
     return render_template("test.html")
 
-@main.route('/user/<username>')
+@main.route('/user/<username>', methods=['GET', 'POST'])
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
-    pagination = user.questions.order_by(Question.timestamp.desc()).paginate(
-        page, per_page=current_app.config['FLASKY_QUESTIONS_PER_PAGE'],
+    askpagination = Question.query.filter_by(author_id=user.id).order_by(Question.timestamp.desc()).paginate(
+        page, per_page=current_app.config['PROFILE_QUESTIONS_PER_PAGE'],
         error_out=False)
-    questions = pagination.items
-    return render_template('user.html', user=user, questions=questions,
-                           pagination=pagination)
+    questions = askpagination.items
+    page = request.args.get('page', 1, type=int)
+    anspagination = Answer.query.filter_by(author_id=user.id).order_by(Answer.timestamp.desc()).paginate(
+        page, per_page=current_app.config['PROFILE_QUESTIONS_PER_PAGE'],
+        error_out=False)
+    questions = askpagination.items
+    answers = anspagination.items
+    return render_template('user.html', user=user, questions=questions, answers=answers,
+                           askpagination=askpagination, anspagination=anspagination)
+
+@main.route('/ask', methods=['GET', 'POST'])
+@login_required
+def ask():
+    form = QuestionForm()
+    if current_user.can(Permission.WRITE_ARTICLES) and \
+            form.validate_on_submit():
+        question = Question(body=form.body.data,
+                            title = form.title.data,         
+                    author=current_user._get_current_object())
+        db.session.add(question)
+        """ only insert data to sql table can trigger the action to generate an unique ID"""
+        id = Question.query.filter_by(title=question.title).order_by(Question.timestamp.desc()).first().id
+        return redirect(url_for('.question', id=id))
+    return render_template("ask.html", form=form)
+
+
+@main.route('/answer/<int:id>', methods=['GET', 'POST'])
+@login_required
+def answer(id):
+    """show the answer"""
+    answer = Answer.query.filter_by(id=id).first_or_404()
+    return render_template("answer.html", answer=answer)
+
+@main.route('/question/<int:id>', methods=['GET', 'POST'])
+@login_required
+def question(id):
+    """show the questions"""
+    answerForm = AnswerForm()
+    commentForm = CommentForm()
+    question = Question.query.filter_by(id=id).first_or_404()
+    answer_id =  request.args.get('answer_id', -1, type=int)
+    comments = Comment.query.filter_by(answer_id=answer_id).order_by(Comment.timestamp.desc())
+    answer= Answer.query.filter_by(id=answer_id)
+    if current_user.can(Permission.WRITE_ARTICLES) and \
+       answerForm.validate_on_submit():
+                answer = Answer(answer=answerForm.body.data,
+                                 author=current_user._get_current_object(),
+                                 authorname=current_user.username,
+                                 question=question )
+                db.session.add(answer)
+                return redirect(url_for('.question', id=id))
+
+    if current_user.can(Permission.WRITE_ARTICLES) and \
+       commentForm.validate_on_submit():
+                comment = Comment(comment=commentForm.body.data,
+                                 author=current_user._get_current_object(),
+                                 authorname=current_user.username,
+                                 answer=answer)
+                db.session.add(answer)
+                return redirect(url_for('.question', id=id))
+
+    answers = Answer.query.filter_by(question_id=question.id).order_by(Answer.timestamp.desc())            
+    asker = User.query.filter_by(id=question.author_id).first()
+    return render_template("question.html", question=question, asker=asker,
+                           answerForm=answerForm, answers=answers, comments=comments,
+                           commentForm=commentForm, answer_id=answer_id)
 
 
 @main.route('/edit-profile', methods=['GET', 'POST'])

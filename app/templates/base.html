@@ -98,7 +98,7 @@
                 <li><a href="{{ url_for('main.test') }}">消息</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="{{ url_for('main.index') }}">提问</a></li>
+                <li><a href="{{ url_for('main.ask') }}">提问</a></li>
                 {% if current_user.is_authenticated %}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -138,9 +138,12 @@
 	  
 	<div class="col-md-6">
 	  {% block page_content %}{% endblock %}
+	  {% block user_miscells %}  {% endblock %}
         </div>
 	<div class="col-md-4">
-	  {% block rside_bar   %}  {% endblock %}
+	  {% block rside_bar   %}
+	    <a href=http://glyphicons.com/> glyphicons </a>
+	  {% endblock %}
 	</div>	  
     {% endblock %}
 </div>
@@ -149,3 +152,7 @@
 {{ super() }}
 {{ moment.include_moment() }}
 {% endblock %}
+
+
+
+

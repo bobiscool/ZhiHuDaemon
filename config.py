@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -13,7 +14,8 @@ class Config:
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
     FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
-    FLASKY_QUESTIONS_PER_PAGE = 20
+    INDEX_QUESTIONS_PER_PAGE = 20
+    PROFILE_QUESTIONS_PER_PAGE = 15    
 
     @staticmethod
     def init_app(app):

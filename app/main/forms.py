@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*
 from flask.ext.wtf import Form
 from wtforms import StringField, TextAreaField, BooleanField, SelectField,\
     SubmitField
@@ -50,5 +51,15 @@ class EditProfileAdminForm(Form):
 
 
 class QuestionForm(Form):
+    title =StringField(validators=[Required()])
     body = TextAreaField("What's on your mind?", validators=[Required()])
     submit = SubmitField('Submit')
+
+class AnswerForm(Form):
+    body = TextAreaField('', validators=[Required()])
+    submit = SubmitField('Submit')
+
+class CommentForm(Form):
+    body = TextAreaField('', validators=[Required()])
+    submit = SubmitField('Submit')
+    

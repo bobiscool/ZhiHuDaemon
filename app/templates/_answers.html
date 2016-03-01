@@ -1,0 +1,10 @@
+<ul class="posts">
+    {% for answer in answers %}
+    <li class="post">
+            <a href="{{ url_for('.answer', id=answer.id) }}">
+	       <h4> {{ answer.authorname }} </h4>
+            </a>
+           <div class="post-body">{{ answer.answer }}</div>
+    </li>
+    {% endfor %}
+</ul>

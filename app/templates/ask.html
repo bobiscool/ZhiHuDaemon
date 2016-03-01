@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}super() - Post{% endblock %}
+
+{% block page_content %}
+<h4 > What Is Your Questions? </h4>
+{% if current_user.can(Permission.WRITE_ARTICLES) %}
+<div>
+  {{ wtf.quick_form(form) }}
+</div>
+{% endif %}
+{% endblock %}

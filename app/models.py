@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*
+
 from datetime import datetime
 import hashlib
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -61,18 +63,27 @@ class Follow(db.Model):
         followed_id = db.Column(db.Integer, db.ForeignKey('users.id'),
                                                               primary_key=True)
         timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-
+    
 class Answer(UserMixin, db.Model):
     __tablename__ = 'answers'
     id = db.Column(db.Integer, primary_key=True)
     answer = db.Column(db.Text())
+    authorname = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))    
+    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
+    comments = db.relationship('Comment', backref='answer', lazy='dynamic')
 
+class Comment(UserMixin, db.Model):
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True)
+    comment = db.Column(db.Text())
+    authorname= db.Column(db.String(64))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)    
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    answer_id = db.Column(db.Integer, db.ForeignKey('answers.id'))    
 
+    
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -88,6 +99,7 @@ class User(UserMixin, db.Model):
     avatar_hash = db.Column(db.String(32))
     questions = db.relationship('Question', backref='author', lazy='dynamic')
     answers = db.relationship('Answer', backref='author', lazy='dynamic')
+    comments = db.relationship('Comment', backref='author', lazy='dynamic')
     
     """
     followed = db.relationship('User',
@@ -226,17 +238,4 @@ class Question(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     answers = db.relationship('Answer', backref='question', lazy='dynamic')
-    @staticmethod
-    def generate_fake(count=100):
-        from random import seed, randint
-        import forgery_py
 
-        seed()
-        user_count = User.query.count()
-        for i in range(count):
-            u = User.query.offset(randint(0, user_count - 1)).first()
-            p = Question(body=forgery_py.lorem_ipsum.sentences(randint(1, 5)),
-                     timestamp=forgery_py.date.date(True),
-                     author=u)
-            db.session.add(p)
-            db.session.commit()

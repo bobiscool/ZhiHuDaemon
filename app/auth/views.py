@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*
 from flask import render_template, redirect, request, url_for, flash
 from flask.ext.login import login_user, logout_user, login_required, \
     current_user
@@ -45,6 +46,7 @@ def register():
         db.session.commit()
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)
+
 
 @auth.route('/change-password', methods=['GET', 'POST'])
 @login_required

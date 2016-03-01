@@ -1,48 +1,102 @@
 {% extends "base.html" %}
-{% import "_macros.html" as macros %}
+<!-- {% import "_macrosForHomePage.html" as macros %} -->
 
-{% block title %}super()y - {{ user.username }}{% endblock %}
+{% block title %} {{ super()}} &nbsp; &nbsp {{  user.username }}{% endblock %}
 
 {% block page_content %}
+
 <div class="page-header">
-    <div class="profile-header">
         <h1>{{ user.username }}</h1>
-        {% if user.name or user.location %}
         <p>
-            {% if user.name %}{{ user.name }}<br>{% endif %}
-<!--            <img class="img-rounded profile-thumbnail" src="{{ user.gravatar() }}">
--->
+          {% if user.about_me %}{{ user.about_me }}{% endif %}	  
         </p>
-        {% endif %}
-        {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
-	<p>  获得&nbsp; &nbsp <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> &nbsp 赞同
+<!--	<p>
+	  <div>
+            <img class="img-rounded profile-thumbnail" src="{{ user.gravatar() }}">
+	  </div>
+	</p>
+-->	<p>  获得&nbsp; &nbsp <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> &nbsp 赞同
 	     &nbsp <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> &nbsp 感谢
 	</p>
-	<nav class="navbar navbar-default style="color:white"">
-	  <ul class="nav navbar-nav">
-	  <li class="navbar-left"><a href="#">提问</a></li>
-	  <li><a href="#">回答</a></li>
-	  <li><a href="#">专栏文章</a></li>
-	  <li><a href="#">收藏</a></li>
-	  <li><a href="#">公共编辑</a></li>
-	  </ul>
-	</nav>
-        <p>{{ user.questions.count() }} blog questions.</p>
-        <p>
-            {% if user == current_user %}
-            <a class="btn btn-default" href="{{ url_for('.edit_profile') }}">Edit Profile</a>
-            {% endif %}
-            {% if current_user.is_administrator() %}
-            <a class="btn btn-danger" href="{{ url_for('.edit_profile_admin', id=user.id) }}">Edit Profile [Admin]</a>
-            {% endif %}
-        </p>
-    </div>
+
+	<ul class="nav nav-pills" role="tablist" >
+	    <li role="presentation" class="active">
+	      <a href="#home" aria-controls="home" role="tab" data-toggle="tab">
+	        <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+	      </a>
+	    </li>
+	    <li role="presentation">
+	       <a href="#asktab" aria-controls="asktab" role="tab" data-toggle="tab">
+	         {{ user.questions.count() }} 提问
+	       </a>
+	    </li>
+	    <li role="presentation">
+	       <a href="#answertab" aria-controls="answertab" role="tab" data-toggle="tab">
+	         {{ user.answers.count()}} 回答
+	       </a>
+	    </li>
+	    <li role="presentation">
+	       <a href="#article" aria-controls="article" role="tab" data-toggle="tab">
+	         专栏文章
+	       </a>
+	    </li>
+	    <li role="presentation">
+	       <a href="#collection" aria-controls="collection" role="tab" data-toggle="tab">
+	         收藏
+	       </a>
+	    </li>
+	    <li role="presentation">
+	       <a href="#editpublic" aria-controls="editpublic" role="tab" data-toggle="tab">
+	         公共编辑
+	       </a>
+	    </li>
+	</ul>
 </div>
-<h3>Posts by {{ user.username }}</h3>
-{% include '_posts.html' %}
-{% if pagination %}
-<div class="pagination">
-    {{ macros.pagination_widget(pagination, '.user', username=user.username) }}
-</div>
-{% endif %}
 {% endblock %}
+
+{% block user_miscells  %}
+       <div class="tab-content">
+	 <div role="tabpanel" class="tab-pane active" id="home">
+		     我的提问
+	       <ul>
+		 {% for question in questions[0:4] %}
+  	           <li >
+                     <a href="{{ url_for('.question', id=question.id) }}">
+	               <h4> {{ question.title }} </h4>
+                     </a>
+                      {{ question.body }}
+	           </li>						 
+    	           {% endfor %}
+               </ul>
+	       <hr></hr>
+	       我的回答
+	       <ul>
+		 {% for answer in answers[0:4] %}
+  	           <li >
+                     <a href="{{ url_for('.answer', id=answer.id) }}">
+	               <h4> {{ answer.authorname }} </h4>
+                     </a>
+                      {{ answer.answer }}
+	           </li>						 
+    	           {% endfor %}
+               </ul>
+	 </div>
+	 <div role="tabpanel" class="tab-pane" id="asktab">
+	   {% include '_questions.html' %}
+  	    {% if askpagination %}
+	      {{ macros.pagination_widget(askpagination, '.user', user.username) }}
+	    {% endif %}
+	  </div>	  
+	 <div role="tabpanel" class="tab-pane" id="answertab">
+	   {% include '_answers.html' %}
+  	    {% if anspagination %}
+	      {{ macros.pagination_widget(anspagination, '.user', user.username) }}
+	    {% endif %}
+	 </div>	  
+	  <div role="tabpanel" class="tab-pane" id="article">article</div>
+	  <div role="tabpanel" class="tab-pane" id="collection">collection</div>
+	  <div role="tabpanel" class="tab-pane" id="editpublic">editpublic</div>
+	 </div>
+	
+
+{% endblock  %}
