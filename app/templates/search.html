@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %} {{ super()}} &nbsp; &nbsp
+   {% if keyword %}
+  搜索{{ keyword  }}
+  {% endif %}
+{% endblock %}
+
+{% block page_content %}
+{% include '_questions.html' %}
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.search') }}
+</div>
+{% endif %}
+
+{% endblock %}
+
+

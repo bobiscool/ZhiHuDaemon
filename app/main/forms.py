@@ -63,3 +63,12 @@ class CommentForm(Form):
     body = TextAreaField('', validators=[Required()])
     submit = SubmitField('Submit')
     
+class ChangePassWordForm(Form):
+    old_password = StringField('old password', validators=[Required()])
+    password  = StringField('new password', validators=[Required()])
+    submit = SubmitField('Submit')
+    
+class ChangeEmailForm(Form):
+    email = StringField('Email', validators=[Required(), Length(1, 64),
+                                             Email()])
+    submit = SubmitField('Submit')

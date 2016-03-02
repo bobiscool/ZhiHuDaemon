@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block page_content %}
+        <h1>{{ current_user.username }}</h1>
+
+	<ul class="nav nav-tabs" role="tablist" >
+
+	    <li roleg="presentation">
+	      <a href="#account" aria-controls="account" role="tab" data-toggle="tab">
+		账户
+	       </a>
+	    </li>
+	    <li role="presentation">
+	      <a href="#notification" aria-controls="notification" role="tab" data-toggle="tab">
+		消息和邮件
+	       </a>
+	    </li>
+
+	</ul>
+	<div class="tab-content col-md-6">
+	  <div role="tabpanel" class="tab-pane" id="account">
+	    <br></br>
+	       {{ wtf.quick_form(passwdForm) }}
+	 </div>	  
+	  <div role="tabpanel" class="tab-pane" id="notification">
+	    <br></br>
+	       {{ wtf.quick_form(emailForm) }}
+	   </div>
+	 </div>
+{% endblock  %}
+

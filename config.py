@@ -15,7 +15,7 @@ class Config:
     FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     INDEX_QUESTIONS_PER_PAGE = 20
-    PROFILE_QUESTIONS_PER_PAGE = 15    
+    PROFILE_QUESTIONS_PER_PAGE = 15
 
     @staticmethod
     def init_app(app):

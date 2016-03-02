@@ -3,7 +3,8 @@ from flask import render_template, redirect, url_for, abort, flash, request,\
     current_app
 from flask.ext.login import login_required, current_user
 from . import main
-from .forms import EditProfileForm, EditProfileAdminForm, QuestionForm, AnswerForm, CommentForm
+from .forms import EditProfileForm, EditProfileAdminForm, QuestionForm, AnswerForm, CommentForm,\
+    ChangePassWordForm, ChangeEmailForm
 from .. import db
 from ..models import Permission, Role, User, Question, Answer, Comment
 from ..decorators import admin_required
@@ -19,11 +20,49 @@ def index():
     return render_template('index.html', questions=questions,
                            pagination=pagination)
 
+@main.route('/search', methods=['GET', 'POST'])
+def search():
+    if request.method == 'POST' :
+        keyword = "%" + request.form['search'] + "%"
+        if keyword in "%%":
+                return render_template("search.html")
+        page = request.args.get('page', 1, type=int)
+        pagination = Question.query.filter(Question.title.like(keyword)).order_by(Question.timestamp.desc()).paginate(
+            page, per_page=current_app.config['INDEX_QUESTIONS_PER_PAGE'],
+            error_out=False)
+        questions = pagination.items
+        return render_template("search.html", questions=questions, pagination=pagination, keyword=keyword[1:-1])
+    return render_template("search.html")
+        
 @main.route('/test', methods=['GET', 'POST'])
 def test():
     return render_template("test.html")
 
+@main.route('/setting/<navtab>', methods=['GET', 'POST'])
+@main.route('/setting', methods=['GET', 'POST'])
+@login_required
+def setting(navtab='profile'):
+    passwdForm = ChangePassWordForm()
+    emailForm  = ChangeEmailForm()
+    if emailForm.validate_on_submit():
+        current_user.email = emailForm.email.data
+        db.session.add(current_user)
+        flash("your email has been updated")
+        return redirect(url_for('.user', username=current_user.username))
+    if passwdForm.validate_on_submit():
+        if current_user.verify_password(passwdForm.old_password.data):
+            current_user.password = passwdForm.password.data
+            db.session.add(current_user)
+            flash("your password has been updated")
+            return redirect(url_for('.user', username=current_user.username))
+        else:
+            flash("invalid password")
+        
+    return render_template("setting.html", passwdForm=passwdForm, emailForm=emailForm)
+
+
 @main.route('/user/<username>', methods=['GET', 'POST'])
+@login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
