@@ -15,9 +15,24 @@
             <img class="img-rounded profile-thumbnail" src="{{ user.gravatar() }}">
 	  </div>
 	</p>
--->	<p>  获得&nbsp; &nbsp <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> &nbsp 赞同
-	     &nbsp <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> &nbsp 感谢
-	</p>
+-->	<div>
+
+
+     获得&nbsp; &nbsp <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> &nbsp 赞同
+      &nbsp <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> &nbsp 感谢
+      &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+       {% if current_user.can(Permission.FOLLOW) and user != current_user %}
+     
+         {% if not current_user.is_following(user) %}
+           <a href="{{ url_for('.follow', username=user.username) }}" class="text-right">
+              Follow</a>
+         {% else %}
+           <a href="{{ url_for('.unfollow', username=user.username)}}" class="text-right">
+              Unfollow</a>
+         {% endif %}
+      {% endif %}
+
+	</div>
 
 	<ul class="nav nav-pills" role="tablist" >
 	    <li role="presentation" class="active">
@@ -35,6 +50,7 @@
 	         {{ user.answers.count()}} 回答
 	       </a>
 	    </li>
+	    <!--
 	    <li role="presentation">
 	       <a href="#article" aria-controls="article" role="tab" data-toggle="tab">
 	         专栏文章
@@ -50,6 +66,7 @@
 	         公共编辑
 	       </a>
 	    </li>
+	    -->
 	</ul>
 </div>
 {% endblock %}
@@ -97,6 +114,20 @@
 	  <div role="tabpanel" class="tab-pane" id="collection">collection</div>
 	  <div role="tabpanel" class="tab-pane" id="editpublic">editpublic</div>
 	 </div>
-	
+{% endblock  %}
+       
+{% block rside_bar   %}
 
+       <br></br><br></br>
+       <div>
+       <p> <b>
+	     关注了 &nbsp; &nbsp; &nbsp; &nbsp;
+	     关注者
+	     </b>
+       </p>
+       <p>
+	 {{ user.followed.count() }} 个人 &nbsp; &nbsp; &nbsp; &nbsp;
+         {{ user.follower.count() }} 个人
+</p>
+</div>
 {% endblock  %}

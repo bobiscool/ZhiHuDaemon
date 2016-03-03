@@ -6,8 +6,7 @@ from . import auth
 from .. import db
 from ..models import User
 from ..email import send_email
-from .forms import LoginForm, RegistrationForm, ChangePasswordForm,\
-    PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm
+from .forms import LoginForm, RegistrationForm
 
 
 @auth.before_app_request
@@ -41,7 +40,8 @@ def register():
     if form.validate_on_submit():
         user = User(email=form.email.data,
                     username=form.username.data,
-                    password=form.password.data)
+                    password=form.password.data,
+                    about_me=form.about_me.data)
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('auth.login'))

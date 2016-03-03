@@ -1,7 +1,14 @@
-Flasky
-======
 
-This repository contains the source code examples for my O'Reilly book [Flask Web Development](http://www.flaskbook.com).
+##       一个仿 知乎 的简易实现
 
-The commits and tags in this repository were carefully created to match the sequence in which concepts are presented in the book. Please read the section titled "How to Work with the Example Code" in the book's preface for instructions.
+     
+###  运行方式
+     * virtualenv venv
+     * source venv/bin/activate
+     * pip install -r requirements.txt
+     * python manager.py runserver
+     * 打开 127.0.0.1:5000
 
+
+
+    

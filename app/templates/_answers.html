@@ -1,9 +1,21 @@
 <ul class="posts">
     {% for answer in answers %}
     <li class="post">
+      <p>
             <a href="{{ url_for('.answer', id=answer.id) }}">
 	       <h4> {{ answer.authorname }} </h4>
             </a>
+      </p>
+      <a href="{{url_for('.user', username=answer.author.username)}}" >
+	<font color=black >
+	  <B>
+	    {{ answer.author.username }}
+	    {% if answer.author.about_me %}
+	    , {{ answer.author.about_me }}
+	    {% endif %}
+	  </B>
+        </font>
+      </a>	    
            <div class="post-body">{{ answer.answer }}</div>
     </li>
     {% endfor %}

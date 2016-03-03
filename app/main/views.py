@@ -7,7 +7,7 @@ from .forms import EditProfileForm, EditProfileAdminForm, QuestionForm, AnswerFo
     ChangePassWordForm, ChangeEmailForm
 from .. import db
 from ..models import Permission, Role, User, Question, Answer, Comment
-from ..decorators import admin_required
+from ..decorators import admin_required,  permission_required
 
 
 @main.route('/', methods=['GET', 'POST'])
@@ -37,6 +37,38 @@ def search():
 @main.route('/test', methods=['GET', 'POST'])
 def test():
     return render_template("test.html")
+
+
+@main.route('/follow/<username>')
+@login_required
+@permission_required(Permission.FOLLOW)
+def follow(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Invalid user.')
+        return redirect(url_for('.index'))
+    if current_user.is_following(user):
+        flash('You are already following this user.')
+        return redirect(url_for('.user', username=username))
+    current_user.follow(user)
+    flash('You are now following %s.' % username)
+    return redirect(url_for('.user', username=username))
+    
+
+@main.route('/unfollow/<username>')
+@login_required
+@permission_required(Permission.FOLLOW)
+def unfollow(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Invalid user.')
+        return redirect(url_for('.index'))
+    if not current_user.is_following(user):
+        flash('You are not following this user.')
+        return redirect(url_for('.user', username=username))
+    current_user.unfollow(user)
+    flash('You are not following %s anymore.' % username)
+    return redirect(url_for('.user', username=username))
 
 @main.route('/setting/<navtab>', methods=['GET', 'POST'])
 @main.route('/setting', methods=['GET', 'POST'])
@@ -89,6 +121,7 @@ def ask():
                             title = form.title.data,         
                     author=current_user._get_current_object())
         db.session.add(question)
+        db.session.commit()
         """ only insert data to sql table can trigger the action to generate an unique ID"""
         id = Question.query.filter_by(title=question.title).order_by(Question.timestamp.desc()).first().id
         return redirect(url_for('.question', id=id))

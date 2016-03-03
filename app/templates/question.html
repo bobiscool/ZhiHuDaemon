@@ -39,6 +39,10 @@
   {% if current_user.about_me %}
   , {{ current_user.about_me }}
   {% endif %}
+  <br></br>
+  <p>
+    <font color=grey> 回答问题，赚取积分</font>
+    </p>
 {{ wtf.quick_form(answerForm) }}
 </div>
 {% endblock %}
